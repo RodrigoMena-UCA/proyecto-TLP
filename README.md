@@ -1,10 +1,11 @@
 # Parser LL(1) – Fase 1 (Proyecto TLP02-2025)
 
 Este proyecto implementa un **parser LL(1)** mínimo para un subconjunto de expresiones y asignaciones tipo C, y demuestra sus **limitaciones frente al lenguaje natural** comparándolo con **spaCy**.  
-Alcance alineado a Fase 1: implementar parser formal + demo comparativa con NLP:contentReference[oaicite:2]{index=2}.
+Alcance alineado a Fase 1: implementar parser formal + demo comparativa con NLP
 
 ## Requisitos
-- Python 3.11+ (ideal 3.12 en Windows 11)
+- Python 3.11+ (ideal 3.12 en Windows 11):
+- `winget install -e --id Python.Python.3.12`
 - `pip install -r requirements.txt`
 - `python -m spacy download es_core_news_sm`
 
