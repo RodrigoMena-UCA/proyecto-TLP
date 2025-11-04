@@ -1,0 +1,5 @@
+= a + b;                # falta ID al inicio
+a = b + ;               # falta término
+a = (b + c;             # paréntesis sin cerrar
+a = b + c) ;            # paréntesis extra
+hola como estas ;       # tokens no válidos para la gramática formal
