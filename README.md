@@ -1,80 +1,135 @@
 # Parser LL(1) - Fase 1 (Proyecto TLP02-2025)
 
-Este proyecto implementa un parser LL(1) minimo para un subconjunto de expresiones y asignaciones tipo C y demuestra sus limitaciones frente al lenguaje natural comparandolo con spaCy. El alcance cubre la Fase 1: parser formal y demostracion comparativa con NLP.
+Este proyecto implementa un parser LL(1) mínimo para un subconjunto de expresiones y asignaciones tipo C. Su objetivo es demostrar las limitaciones de los parsers formales frente al lenguaje natural, comparándolo con la librería **spaCy**.
 
-## Requisitos
-- Python 3.11+ (ideal 3.12 en Windows 11)
-- `winget install -e --id Python.Python.3.12`
-- `pip install -r requirements.txt`
-- `python -m spacy download es_core_news_sm`
+El alcance cubre la **Fase 1**: parser formal, driver de pruebas y demostración comparativa con NLP.
 
-## Estructura
-- `parser_formal/` -> Lexer, gramatica, conjuntos FIRST/FOLLOW, tabla LL(1), parser y driver CLI.
-- `parser_formal/examples/` -> Casos validos e invalidos para ejecutar desde archivos.
-- `parser_formal/demo/compare_with_spacy.py` -> Comparacion con spaCy sobre oraciones en espanol.
-- `parser_formal/tests/` -> Pruebas unitarias del parser y del driver.
+## 🛠 Guía de Instalación y Configuración (Paso a Paso)
 
-## Como ejecutar
+Sigue este orden exacto para evitar errores de dependencias o rutas.
+
+### 1. Instalar Python
+Necesitas Python 3.11 o superior (idealmente 3.12).
+En caso no tenerlo instalado se puede hacer con:
 ```powershell
-# activar entorno virtual (Windows PowerShell)
-.venv\Scripts\activate
+winget install -e --id Python.Python.3.12
+```
 
-# correr parser sobre una cadena puntual
+### 2. Crear el Entorno Virtual
+
+Para mantener el proyecto limpio, crea un entorno virtual aislado (solo se necesita hacer la primera vez):
+
+```powershell
+python -m venv .venv
+```
+
+### 3. Activar el Entorno
+
+Antes de instalar nada, se debe "entrar" al entorno:
+
+```powershell
+.\.venv\Scripts\activate
+```
+
+El comando habra funcionado cuando aparezca `(.venv)` al principio de la línea de comandos.
+
+### 4. Instalar Dependencias
+
+Ahora que se esta dentro del entorno (.venv), se debe instalar las librerías y el modelo de lenguaje necesario:
+
+```powershell
+pip install -r requirements.txt
+python -m spacy download es_core_news_sm
+```
+
+---
+
+## 📂 Estructura del Proyecto
+
+- `parser_formal/` → Código fuente: Lexer, gramática, conjuntos FIRST/FOLLOW, tabla LL(1), parser y driver CLI.  
+- `parser_formal/examples/` → Archivos de texto con casos de prueba válidos e inválidos.  
+- `parser_formal/demo/compare_with_spacy.py` → Script de comparación entre el parser rígido y spaCy (NLP).  
+- `parser_formal/tests/` → Pruebas unitarias automatizadas (pytest).  
+
+---
+
+## 🚀 Cómo Ejecutar
+
+Asegúrate de tener el entorno activado (.venv) antes de correr estos comandos.
+
+### 1. Probar el Parser (Modo Manual)
+
+Puedes pasar una cadena de texto directamente para ver si es aceptada:
+
+```powershell
 python -m parser_formal.driver "a = b + c * (d - e);"
+```
 
-# correr parser leyendo archivos de ejemplo incluidos en el repo
+### 2. Leer desde Archivos
+
+El proyecto incluye ejemplos listos para usar.
+
+```powershell
+# Ejecutar un archivo con sintaxis correcta
 python -m parser_formal.driver --file parser_formal/examples/expression_ok.txt
+
+# Ejecutar un archivo con errores intencionales
 python -m parser_formal.driver --file parser_formal/examples/expression_bad.txt
+```
 
-# ejecutar pruebas automatizadas
-python -m pytest
+### 3. Ejecutar la Demo (Parser Formal vs spaCy)
 
-# demo NLP vs parser formal (usar -m para resolver el paquete)
+Este script compara cómo analiza una oración nuestro parser (que fallará con lenguaje natural) vs cómo lo hace una IA moderna.
+
+```powershell
 python -m parser_formal.demo.compare_with_spacy
 ```
 
-## Ejemplos de ejecucion
-Resultados obtenidos al correr los comandos anteriores en PowerShell:
+### 4. Ejecutar Pruebas Automatizadas
+
+Para verificar que todo el código funciona correctamente:
 
 ```powershell
-> python -m parser_formal.driver "a = b + c * (d - e);"
-ACEPTADA: a = b + c * (d - e);
-
-> python -m parser_formal.driver --file parser_formal/examples/expression_ok.txt
-ACEPTADA: a = b + c * (d - e);
-ACEPTADA: total = num1 - num2 / 3;
-ACEPTADA: x = (y + 2) * (z - 5);
-ACEPTADA: id123 = 42;
-ACEPTADA: result = (a);
-
-> python -m parser_formal.driver --file parser_formal/examples/expression_bad.txt
-RECHAZADA: = a + b;                # falta ID al inicio (Caracter inesperado '#' en posicion 24)
-RECHAZADA: a = b + ;               # falta termino (Caracter inesperado '#' en posicion 24)
-RECHAZADA: a = (b + c;             # parentesis sin cerrar (Caracter inesperado '#' en posicion 24)
-RECHAZADA: a = b + c) ;            # parentesis extra (Caracter inesperado '#' en posicion 24)
-RECHAZADA: hola como estas ;       # tokens no validos para la gramatica formal (Caracter inesperado '#' en posicion 24)
-
-> python -m pytest
-.................                                                        [100%]
-17 passed in 0.07s
+python -m pytest
 ```
 
-Las lineas con `#` en `expression_bad.txt` son comentarios explicativos dentro del archivo y provocan deliberadamente el mensaje de error del lexer para mostrar como se rechazan simbolos fuera de la gramatica.
+---
 
-## Resultados de la demo formal vs spaCy
-El parser LL(1) acepta asignaciones y expresiones de la gramatica definida, pero falla en cuanto la entrada se desvia del subconjunto controlado. La demo produce evidencia concreta:
+## 📊 Resultados Esperados
 
+### Parser Formal
+
+El parser LL(1) es estricto. Aceptará asignaciones matemáticas pero rechazará cualquier cosa fuera de su gramática:
+
+```plaintext
+> python -m parser_formal.driver "a = b + c;"
+ACEPTADA: a = b + c;
+
+> python -m parser_formal.driver "Hola mundo"
+RECHAZADA: Hola mundo (Error: Caracter inesperado 'H')
 ```
-Formal parser: RECHAZA - Juan come manzanas.  (motivo: caracter inesperado '.')
-Formal parser: RECHAZA - El perro azul corre rapido.  (motivo: caracter inesperado '\u00e1')
-Formal parser: RECHAZA - Maria y Jose escriben cartas largas.  (motivo: caracter inesperado '\u00ed')
+
+### Demo NLP vs Formal
+
+Al ejecutar la demo de comparación, verás la diferencia de paradigmas:
+
+```plaintext
+Formal parser: RECHAZA - Juan come manzanas. (motivo: caracter inesperado '.')
+...
+spaCy Analysis:
+Token: Juan | POS: PROPN | Dep: nsubj
+Token: come | POS: VERB  | Dep: ROOT
+Token: manzanas | POS: NOUN | Dep: obj
 ```
 
-En contraste, `python -m parser_formal.demo.compare_with_spacy` imprime el analisis de spaCy, donde cada token recibe etiquetas POS y dependencias, demostrando la diferencia de cobertura entre un parser LL(1) rigido y una libreria NLP estadistica.
+Esto demuestra que mientras el parser formal requiere una sintaxis matemática perfecta, spaCy puede entender estructuras gramaticales del lenguaje humano (Sujeto, Verbo, Objeto).
 
-## Cobertura de pruebas
-- `parser_formal/tests/test_parser.py`: valida aceptaciones y rechazos esperados del parser LL(1).
-- `parser_formal/tests/test_driver_cli.py`: cubre el CLI del driver y la lectura desde archivos.
-- `parser_formal/tests/test_ll1_table.py`: asegura consistencia de los conjuntos FIRST/FOLLOW y de la tabla LL(1).
+---
 
-Ejecuta `python -m pytest` para comprobar que todas las pruebas continuan en verde tras cualquier modificacion.
+## ✅ Cobertura de Pruebas
+
+El proyecto incluye tests para asegurar la calidad:
+
+- `test_parser.py`: Valida que las cadenas correctas pasen y las incorrectas fallen.
+- `test_driver_cli.py`: Verifica que la lectura de archivos y argumentos funcione.
+- `test_ll1_table.py`: Asegura la consistencia matemática de la tabla LL(1) y conjuntos FIRST/FOLLOW.
